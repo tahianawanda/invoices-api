@@ -28,12 +28,12 @@ it('retrieves an article by its ID and displays its title', function () {
     ]);
 });
 
-it('retrieves an all article by its ID and displays its title', function () {
+it('retrieves all articles and displays their titles', function () {
     $this->withoutExceptionHandling();
 
     $articles = Article::factory()->count(3)->create();
 
-    $response = $this->getJson(route('api.articles.index', $articles))->dump();
+    $response = $this->getJson(route('api.articles.index'));
 
     $response->assertExactJson([
         'data' => [
@@ -73,6 +73,12 @@ it('retrieves an all article by its ID and displays its title', function () {
                     'self' => route('api.articles.show', $articles[2])
                 ]
             ]
+        ],
+        'links' => [
+            'self' => route('api.articles.index')
+        ],
+        'meta' => [
+            'articles_count' => 3
         ]
     ]);
 });

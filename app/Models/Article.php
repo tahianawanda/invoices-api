@@ -43,4 +43,15 @@ class Article extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getExcerptAttribute(): string
+{
+    return substr($this->content, 0, 100) . '...';
+}
+
+public function scopeByCategory($query, $categoryId)
+{
+    return $query->where('category_id', $categoryId);
+}
+
 }
