@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\HasSorts;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSorts;
+    public $correctSorts = ['title', 'content', '-title'];
 
     /**
      * The attributes that are mass assignable.
@@ -45,13 +49,12 @@ class Article extends Model
     }
 
     public function getExcerptAttribute(): string
-{
-    return substr($this->content, 0, 100) . '...';
-}
+    {
+        return substr($this->content, 0, 100) . '...';
+    }
 
-public function scopeByCategory($query, $categoryId)
-{
-    return $query->where('category_id', $categoryId);
-}
-
+    public function scopeByCategory($query, $categoryId)
+    {
+        return $query->where('category_id', $categoryId);
+    }
 }

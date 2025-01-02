@@ -6,7 +6,7 @@ use App\Models\Article;
 uses(RefreshDatabase::class);
 
 it('retrieves an article by its ID and displays its title', function () {
-    $this->withoutExceptionHandling();
+    // $this->withoutExceptionHandling();
 
     $article = Article::factory()->create();
 
@@ -29,7 +29,7 @@ it('retrieves an article by its ID and displays its title', function () {
 });
 
 it('retrieves all articles and displays their titles', function () {
-    $this->withoutExceptionHandling();
+    // $this->withoutExceptionHandling();
 
     $articles = Article::factory()->count(3)->create();
 
