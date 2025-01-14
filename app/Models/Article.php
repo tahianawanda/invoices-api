@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\HasSorts;
+use App\Http\Requests\ArticleStoreRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,6 +48,21 @@ class Article extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function storeArticle(array $data)
+    {
+        $article = new Article([
+            'title' => $data['title'],
+            'slug' => $data['slug'],
+            'content' => $data['content']
+        ]);
+
+        $article->save();
+
+        return $article;
+    }
+
+
 
     public function getExcerptAttribute(): string
     {
