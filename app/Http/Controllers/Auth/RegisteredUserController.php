@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+
+
 
 
 class RegisteredUserController extends Controller
@@ -42,17 +48,47 @@ class RegisteredUserController extends Controller
 
             event(new Registered($user));
 
+            Auth::login($user);
+
             return SuccessResource::make([
                 'success' => true,
                 'message' => 'Successfully registered!',
                 'data' => $user,
                 'data_resource' => UserResource::class,
-            ]);
+            ])->response()->setStatusCode(200);
+        } catch (ValidationException $e) {
+            Log::warning('Errores de validación:', $e->errors());
+            return ErrorResource::make([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ])->response()->setStatusCode(422);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                Log::warning('Conflicto de datos únicos:', ['exception' => $e]);
+                return ErrorResource::make([
+                    'message' => 'Conflict: Duplicate entry',
+                    'errors' => ['details' => 'The email is already in use.'],
+                ])->response()->setStatusCode(409);
+            }
+            throw $e;
+        } catch (\PDOException $e) {
+            Log::error('Error de conexión a la base de datos:', ['exception' => $e]);
+            return ErrorResource::make([
+                'message' => 'Database connection error',
+                'errors' => ['details' => $e->getMessage()],
+            ])->response()->setStatusCode(503);
+        } catch (HttpException $e) {
+            Log::warning('Demasiadas solicitudes de registro:', ['exception' => $e]);
+            return ErrorResource::make([
+                'message' => 'Too many requests',
+                'errors' => ['details' => 'You have exceeded the number of allowed registration attempts. Try again later.'],
+            ])->response()->setStatusCode(429);
         } catch (\Throwable $th) {
+            Log::error('Error general al registrar usuario:', ['exception' => $th]);
             return ErrorResource::make([
                 'message' => 'Failed to register',
                 'errors' => ['details' => $th->getMessage()],
-            ]);
+            ])->response()->setStatusCode(500);
         }
     }
 }

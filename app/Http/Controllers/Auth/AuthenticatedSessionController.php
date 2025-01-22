@@ -10,6 +10,8 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthenticatedSessionController extends Controller
 {
@@ -19,6 +21,9 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
     {
         try {
+
+            Log::info('Datos recibidos en storeUser:', $request->all());
+
             $request->authenticate();
 
             $request->session()->regenerate();
@@ -30,12 +35,12 @@ class AuthenticatedSessionController extends Controller
                 'message' => 'Successful login!',
                 'data' => $user,
                 'data_resource' => UserResource::class,
-            ], 200);
+            ])->response()->setStatusCode(200);
         } catch (\Throwable $th) {
             return ErrorResource::make([
                 'message' => 'Failed to authenticate',
                 'errors' => ['details' => $th->getMessage()],
-            ], 401);
+            ])->response()->setStatusCode(401);
         }
     }
 
@@ -45,6 +50,8 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request)
     {
         try {
+            log::info('User auth: ', $request->all());
+            
             $user = Auth::user();
 
             Auth::guard('web')->logout();
@@ -55,14 +62,15 @@ class AuthenticatedSessionController extends Controller
 
             return SuccessResource::make([
                 'success' => true,
+                'message' => 'Successfully disconnected!',
                 'data' => $user,
                 'data_resource' => UserResource::class,
-            ]);
+            ])->response()->setStatusCode(200);
         } catch (\Throwable $th) {
             return ErrorResource::make([
                 'message' => 'Failed to logout',
                 'errors' => ['details' => $th->getMessage()],
-            ]);
+            ])->response()->setStatusCode(401);
         }
     }
 }

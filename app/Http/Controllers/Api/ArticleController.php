@@ -9,7 +9,10 @@ use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ErrorResource;
 use App\Http\Resources\SuccessResource;
 use App\Models\Article;
+// use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 
 
 class ArticleController extends Controller
@@ -25,34 +28,43 @@ class ArticleController extends Controller
     {
         $article = Article::findOrFail($id);
 
-        return ArticleResource::make($article);
+        return ArticleResource::make($article)
+            ->response()->setStatusCode(200);
     }
 
     public function index()
     {
         $articles = Article::applySorts(request('sort'))->get();
 
-        return ArticleCollection::make($articles);
+        return ArticleCollection::make($articles)
+            ->response()->setStatusCode(200);
     }
 
     public function store(ArticleStoreRequest $request)
     {
         try {
-            Log::info('Datos recibidos en storeArticle:', $request->all());
 
-            $article = $this->article->storeArticle($request->validated());
+            if (Auth::check()) {
+                /** @var \App\Models\User $user */
+                $user = Auth::user();
+                
+                Log::info('Datos recibidos en storeArticle:', $request->all());
+                Log::info('Datos recibidos en storeArticle:', $user->toArray());
 
-            return SuccessResource::make([
-                'success' => true,
-                'message' => 'The article has been successfully created!',
-                'data' => $article,
-                'data_resource' => ArticleResource::class,
-            ]);
+                $article = $this->article->storeArticle($request->validated(), $user->id);
+
+                return SuccessResource::make([
+                    'success' => true,
+                    'message' => 'The article has been successfully created!',
+                    'data' => $article,
+                    'data_resource' => ArticleResource::class,
+                ])->response()->setStatusCode(201);
+            }
         } catch (\Throwable $th) {
             return ErrorResource::make([
                 'success' => false,
                 'message' => $th->getMessage(),
-            ]);
+            ])->response()->setStatusCode(501);
         }
     }
 }

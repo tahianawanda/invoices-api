@@ -49,12 +49,13 @@ class Article extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function storeArticle(array $data)
+    public function storeArticle(array $data, $id)
     {
         $article = new Article([
             'title' => $data['title'],
             'slug' => $data['slug'],
-            'content' => $data['content']
+            'content' => $data['content'],
+            'user_id' => $id
         ]);
 
         $article->save();
