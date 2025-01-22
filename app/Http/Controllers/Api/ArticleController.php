@@ -9,9 +9,9 @@ use App\Http\Resources\ArticleResource;
 use App\Http\Resources\ErrorResource;
 use App\Http\Resources\SuccessResource;
 use App\Models\Article;
-// use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 
 
@@ -23,15 +23,9 @@ class ArticleController extends Controller
     {
         $this->article = $article;
     }
-
-    public function show($id)
-    {
-        $article = Article::findOrFail($id);
-
-        return ArticleResource::make($article)
-            ->response()->setStatusCode(200);
-    }
-
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
         $articles = Article::applySorts(request('sort'))->get();
@@ -39,7 +33,9 @@ class ArticleController extends Controller
         return ArticleCollection::make($articles)
             ->response()->setStatusCode(200);
     }
-
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(ArticleStoreRequest $request)
     {
         try {
@@ -47,7 +43,7 @@ class ArticleController extends Controller
             if (Auth::check()) {
                 /** @var \App\Models\User $user */
                 $user = Auth::user();
-                
+
                 Log::info('Datos recibidos en storeArticle:', $request->all());
                 Log::info('Datos recibidos en storeArticle:', $user->toArray());
 
@@ -66,5 +62,30 @@ class ArticleController extends Controller
                 'message' => $th->getMessage(),
             ])->response()->setStatusCode(501);
         }
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $article = Article::findOrFail($id);
+
+        return ArticleResource::make($article)
+            ->response()->setStatusCode(200);
+    }
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
     }
 }
