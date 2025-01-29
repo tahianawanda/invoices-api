@@ -4,7 +4,13 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-
+/**
+ * @OA\Schema(
+ *     schema="CategoryCollection",
+ *     type="array",
+ *     @OA\Items(ref="#/components/schemas/CategoryResource")
+ * )
+ */
 class CategoryCollection extends ResourceCollection
 {
     /**

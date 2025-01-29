@@ -5,6 +5,16 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @OA\Schema(
+ *     schema="SuccessResource",
+ *     type="object",
+ *     title="Success Response",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Successfully created!"),
+ *     @OA\Property(property="data", type="object")
+ * )
+ */
 
 class SuccessResource extends JsonResource
 {
