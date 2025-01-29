@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -47,6 +48,47 @@ class Category extends Model
         ]);
 
         $category->save();
+
+        return $category;
+    }
+
+    public function search($id)
+    {
+        try {
+            $category = $this->findOrFail($id);
+
+            return $category;
+        } catch (ModelNotFoundException) {
+            throw new ModelNotFoundException;
+        }
+    }
+
+    public function showCategory($id)
+    {
+        $category = $this->search($id);
+
+        return $category;
+    }
+
+    public function indexCategory()
+    {
+        return $this->all();
+    }
+
+    public function updateCategory(array $request, string $id)
+    {
+        $category = $this->search($id);
+
+        $category->update($request);
+
+        return $category;
+    }
+
+    public function destroyCategory(string $id)
+    {
+        $category = $this->search($id);
+
+        $category->delete();
 
         return $category;
     }

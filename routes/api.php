@@ -43,7 +43,7 @@ Route::put('articles', [ArticleController::class, 'update'])->name('articles.upd
  * 
  */
 Route::post('category', [CategoryController::class, 'store'])->name('category.store');
-Route::get('category', [CategoryController::class, 'index'])->name('category.index');
-Route::get('category/{id}', [CategoryController::class, 'show'])->name('category.show');
-Route::delete('category', [CategoryController::class, 'destroy'])->name('category.destroy');
-Route::put('category', [CategoryController::class, 'update'])->name('category.update');
+Route::get('category/{id}', [CategoryController::class, 'show'])->name('category.show'); // Más específica primero
+Route::get('category', [CategoryController::class, 'index'])->name('category.index');    // Más general después
+Route::delete('category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
+Route::put('category/{id}', [CategoryController::class, 'update'])->name('category.update');
